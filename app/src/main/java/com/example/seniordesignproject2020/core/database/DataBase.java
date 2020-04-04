@@ -35,8 +35,8 @@ public class DataBase extends SQLiteOpenHelper {
     private ModelConverter model_converter;
     private DataConverter data_converter;
 
-    public DataBase(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public DataBase(@Nullable Context context) {
+        super(context, "database", null, 1);
         model_converter = new ModelConverter();
         data_converter = new DataConverter();
     }
@@ -55,8 +55,7 @@ public class DataBase extends SQLiteOpenHelper {
                 + SCAN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + DATE + " LONG,"
                 + IMAGE_LOCATION + " TEXT,"
-                + RESULT + " TEXT,"
-                + "PRIMARY KEY(" + SCAN_ID + "))";
+                + RESULT + " TEXT)";
         db.execSQL(create_scans_table);
 
         String create_red_scan_table = "CREATE TABLE " + RED_SCAN_TABLE + "("

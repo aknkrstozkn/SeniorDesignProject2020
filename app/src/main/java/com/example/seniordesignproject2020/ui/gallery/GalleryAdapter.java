@@ -9,7 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.seniordesignproject2020.R;
+import com.example.seniordesignproject2020.core.Scan;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -19,20 +22,22 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView label;
+        TextView date;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imageView);
+            imageView = itemView.findViewById(R.id.image);
             label = itemView.findViewById(R.id.label);
+            date = itemView.findViewById(R.id.date);
         }
     }
 
     private LayoutInflater inflater;
-    private List<GalleryItem> items;
+    private List<Scan> items;
 
-    public GalleryAdapter(Context context, List<GalleryItem> items) {
+    public GalleryAdapter(Context context, List<Scan> items) {
         this.inflater = LayoutInflater.from(context);
-        this.items = items;
+        this.items = items == null ? new ArrayList<Scan>() : items;
     }
 
     @NonNull
@@ -43,9 +48,10 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        GalleryItem item = items.get(position);
-        holder.imageView.setImageURI(Uri.parse(item.imageUri));
-        holder.label.setText(item.label);
+        Scan item = items.get(position);
+        holder.imageView.setImageURI(Uri.parse(item.image_location));
+        holder.label.setText(item.scan_result);
+        holder.date.setText(new Date(item.date).toString());
     }
 
     @Override

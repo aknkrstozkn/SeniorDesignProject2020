@@ -1,5 +1,7 @@
 package com.example.seniordesignproject2020.ui.gallery;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,13 +22,28 @@ import com.example.seniordesignproject2020.core.database.DataBase;
 public class GalleryFragment extends Fragment {
 
     private GalleryAdapter itemsAdapter = null;
+    private DataBase db = null;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         if(itemsAdapter == null) {
-            DataBase db = new DataBase(getContext());
-            itemsAdapter = new GalleryAdapter(inflater.getContext(), db.get_scans());
+            db = new DataBase(getContext());
+            itemsAdapter = new GalleryAdapter(inflater.getContext(), db.get_scans(), new GalleryAdapter.OnItemInteraction() {
+                @Override
+                public void onDelete(int id) {
+                    db.remove_scan(id);
+                }
+
+                @Override
+                public void onShare(String imgUri, String result) {
+                    Uri uri = Uri.parse(imgUri);
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent .setType("image/*");
+                    intent .putExtra(Intent.EXTRA_STREAM, uri);
+                    getContext().startActivity(intent );
+                }
+            });
         }
 
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);

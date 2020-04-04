@@ -132,6 +132,20 @@ public class DataBase extends SQLiteOpenHelper {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void remove_scan(int sca_id)
+    {
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            String selectQuery = "SELECT * FROM " + SCANS_TABLE + " WHERE " + SCAN_ID + " = " + sca_id;
+            try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+
+                if (cursor.getCount() == 1) {
+                    db.delete(SCANS_TABLE, SCAN_ID + " = ?", new String[]{String.valueOf(sca_id)});
+                }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public Scan get_scan(int scan_id)
     {
         try (SQLiteDatabase db = this.getReadableDatabase())

@@ -6,31 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <TextView
-        android:id="@+id/text_home"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="LOADING!"
-        android:textColor="@color/colorPrimary"
+    <ImageButton
+        android:id="@+id/open_camera"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:fadeScrollbars="false"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_menu_camera"
+        android:tint="#673AB7"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center_horizontal" />
+        android:contentDescription="@string/open_camera" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
+    <TextView
+        style="@style/TextAppearance.AppCompat.Title"
+        android:textColor="#2196F3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="invisible"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="181dp"
-        tools:layout_editor_absoluteY="392dp" />
+        android:text="@string/open_camera"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/open_camera" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

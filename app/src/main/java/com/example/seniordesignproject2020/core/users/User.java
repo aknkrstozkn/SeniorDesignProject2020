@@ -1,6 +1,6 @@
-package com.example.seniordesign2020.core.users;
+package com.example.seniordesignproject2020.core.users;
 
-import com.example.seniordesign2020.core.ScanTypes.ScanType;
+import com.example.seniordesignproject2020.core.scan_types.ScanType;
 
 public abstract class User {
 

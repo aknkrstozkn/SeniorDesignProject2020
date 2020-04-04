@@ -1,2 +1,4 @@
 rootProject.name='SeniorDesignProject2020'
-include ':app'
+include ':app', ':opencv'
+def opencvsdk='C:\\Users\\Emre\\Desktop\\OpenCV-android-sdk'
+project(':opencv').projectDir = new File(opencvsdk + '\\sdk')

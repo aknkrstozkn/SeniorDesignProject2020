@@ -1,4 +1,4 @@
-package com.example.seniordesign2020.core.database;
+package com.example.seniordesignproject2020.core.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

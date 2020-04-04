@@ -1,4 +1,4 @@
-package com.example.seniordesign2020.core.users;
+package com.example.seniordesignproject2020.core.users;
 
 public class Customer extends User {
 

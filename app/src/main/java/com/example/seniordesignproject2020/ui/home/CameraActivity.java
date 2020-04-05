@@ -40,7 +40,7 @@ import static java.sql.Types.NULL;
 
 public class CameraActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
-    public final static String FILE_PATH= Environment.getExternalStorageDirectory().getPath()+"/Scans";
+    public File FILE_PATH;
 
     private Scan scan;
     private ScanType scan_type;
@@ -70,13 +70,14 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
     private String get_image(Mat frame)
     {
-        File dir = new File(FILE_PATH);
-        if(!dir.exists()){
-            dir.mkdir();
+        if(!FILE_PATH.exists()){
+            if(!FILE_PATH.mkdir()) {
+                Log.d("de", "could not create file");
+            }
         }
-        String image_path = FILE_PATH + "/image_" + count + ".jpg";
-        boolean a = Imgcodecs.imwrite(image_path, frame);
-        Uri image_uri = Uri.fromFile(new File(image_path));
+        File image_path = new File(FILE_PATH, "image_" + count + ".jpg");
+        boolean a = Imgcodecs.imwrite(image_path.getAbsolutePath(), frame);
+        Uri image_uri = Uri.fromFile(image_path);
 
         return image_uri.toString();
     }
@@ -86,6 +87,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        FILE_PATH = new File(this.getFilesDir(), "Scans");
 
         button_scan = findViewById(R.id.button_scan);
         button_scan.setOnClickListener(new View.OnClickListener() {

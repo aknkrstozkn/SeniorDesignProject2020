@@ -1,5 +1,6 @@
 package com.example.seniordesignproject2020.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +24,9 @@ public class HomeFragment extends Fragment {
         openCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // todo Intent openCameraIntent = new Intent(getContext(), TakePicture.class);
-                // todo getActivity().startActivity(openCameraIntent);
+                Intent openCameraIntent = new Intent(getContext(), CameraActivity.class);
+                getActivity().startActivity(openCameraIntent);
+
             }
         });
 

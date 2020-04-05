@@ -32,8 +32,25 @@ public class DataBase extends SQLiteOpenHelper {
     public final static String IMAGE_LOCATION = "IMAGE_LOCATION";
     public final static String RESULT = "RESULT";
 
-    private ModelConverter model_converter;
-    private DataConverter data_converter;
+    private static ModelConverter model_converter;
+    private static DataConverter data_converter;
+
+    private static DataBase single_instance = null;
+
+    public Context context;
+
+    public static DataBase getInstance(@Nullable Context context_)
+    {
+        if (single_instance == null)
+        {
+            single_instance = new DataBase(context_);
+        }else if(single_instance.context != context_)
+        {
+            single_instance.close();
+            single_instance = new DataBase(context_);
+        }
+        return single_instance;
+    }
 
     public DataBase(@Nullable Context context) {
         super(context, "database", null, 1);
@@ -74,19 +91,23 @@ public class DataBase extends SQLiteOpenHelper {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public int add_scans_table(Scan scan)
     {
+        int return_value = 0;
         try (SQLiteDatabase db = this.getWritableDatabase())
         {
             ContentValues values = model_converter.scan(scan);
-            return (int)db.insert(SCANS_TABLE, null,values);
+            return_value = (int)db.insert(SCANS_TABLE, null,values);
         }
+
+        return return_value;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void add_red_scan(ScanType scanType, Scan scan)
     {
+        int scan_id = add_scans_table(scan);
         try (SQLiteDatabase db = this.getWritableDatabase())
         {
-            ContentValues values = model_converter.scan_type(scanType, add_scans_table(scan));
+            ContentValues values = model_converter.scan_type(scanType, scan_id);
             db.insert(RED_SCAN_TABLE, null,values);
         }
     }

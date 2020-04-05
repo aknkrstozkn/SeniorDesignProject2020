@@ -22,17 +22,15 @@ import com.example.seniordesignproject2020.core.database.DataBase;
 public class GalleryFragment extends Fragment {
 
     private GalleryAdapter itemsAdapter = null;
-    private DataBase db = null;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         if(itemsAdapter == null) {
-            db = new DataBase(getContext());
-            itemsAdapter = new GalleryAdapter(inflater.getContext(), db.get_scans(), new GalleryAdapter.OnItemInteraction() {
+            itemsAdapter = new GalleryAdapter(inflater.getContext(), DataBase.getInstance(getContext()).get_scans(), new GalleryAdapter.OnItemInteraction() {
                 @Override
                 public void onDelete(int id) {
-                    db.remove_scan(id);
+                    DataBase.getInstance(getContext()).remove_scan(id);
                 }
 
                 @Override

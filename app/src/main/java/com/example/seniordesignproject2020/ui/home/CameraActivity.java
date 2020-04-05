@@ -126,7 +126,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
             Color test_color = new Color(255, 0, 0);
 
             scan_type = new RedColorScan(surface_color, test_color);
-            scan = new Scan(NULL, caledar.getTimeInMillis(), scan_type,
+            scan = new Scan(NULL, System.currentTimeMillis() / 1000, scan_type,
                     get_image(mats[0]), "0.32 Glucose");
             DataBase.getInstance(CameraActivity.this).add_red_scan(scan_type, scan);
 

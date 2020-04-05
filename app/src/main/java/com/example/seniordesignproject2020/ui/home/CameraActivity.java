@@ -48,6 +48,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
     private Calendar caledar;
 
     JavaCameraView javaCameraView;
+    View loading;
     Mat mRGBA, mRGBAT;
     public static Mat circles_;
     public static Mat input;
@@ -86,12 +87,15 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-
+        loading = findViewById(R.id.loading);
+        loading.setVisibility(View.GONE);
         button_scan = findViewById(R.id.button_scan);
         button_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                loading.setVisibility(View.VISIBLE);
+                button_scan.setVisibility(View.GONE);
                 new AsyncImageProcess().execute(mRGBAT);
                 javaCameraView.disableView();
 
@@ -137,10 +141,13 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            // todo  Intent openResultIntent = Intent(CameraActivity.this, f)
+            setResult(10);
+            CameraActivity.this.finish();
         }
     }
 
-    private class HoughCircleTransformTask
+    static private class HoughCircleTransformTask
             extends AsyncTask<Mat, Void, Mat> {
 
         @Override

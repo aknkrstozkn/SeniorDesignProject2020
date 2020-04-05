@@ -18,8 +18,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@android:drawable/ic_menu_camera"
+        android:background="@android:drawable/ic_menu_camera" />
 
-        tools:ignore="MissingConstraints" />
+    <include layout="@layout/fragment_loading" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

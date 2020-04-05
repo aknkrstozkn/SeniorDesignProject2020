@@ -68,6 +68,8 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 onItemInteraction.onDelete(item.id);
+                items.remove(position);
+                notifyDataSetChanged();
             }
         });
         holder.share.setOnClickListener(new View.OnClickListener() {

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.seniordesignproject2020.R;
 import com.example.seniordesignproject2020.core.database.DataBase;
+
+import java.io.File;
 
 public class GalleryFragment extends Fragment {
 
@@ -35,10 +38,14 @@ public class GalleryFragment extends Fragment {
 
                 @Override
                 public void onShare(String imgUri, String result) {
-                    Uri uri = Uri.parse(imgUri);
                     Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent .setType("image/*");
-                    intent .putExtra(Intent.EXTRA_STREAM, uri);
+                    Uri uri = FileProvider.getUriForFile(
+                            getContext(),
+                            getContext().getApplicationContext()
+                                    .getPackageName() + ".provider", new File(Uri.parse(imgUri).getPath()));
+                    intent.setDataAndType(uri, "image/*");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
                     getContext().startActivity(intent );
                 }
             });

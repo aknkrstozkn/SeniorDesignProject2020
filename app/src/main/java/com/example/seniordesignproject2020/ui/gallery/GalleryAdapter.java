@@ -63,7 +63,7 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
         final Scan item = items.get(position);
         holder.imageView.setImageURI(Uri.parse(item.image_location));
         holder.label.setText(item.scan_result);
-        holder.date.setText(new Date(item.date).toString());
+        holder.date.setText(new Date(item.date * 1000).toString());
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

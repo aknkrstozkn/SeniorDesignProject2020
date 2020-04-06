@@ -3,6 +3,7 @@ package com.example.seniordesignproject2020.ui.home;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -20,6 +21,7 @@ import com.example.seniordesignproject2020.core.database.DataBase;
 import com.example.seniordesignproject2020.core.scan_types.RedColorScan;
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
 import com.example.seniordesignproject2020.ui.gallery.GalleryFragment;
+import com.example.seniordesignproject2020.ui.result.ResultActivity;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -135,7 +137,6 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
             scan_type = new RedColorScan(surface_color, test_color);
             scan = new Scan(NULL, System.currentTimeMillis() / 1000, scan_type,
                     get_image(mats[0]), "0.32 Glucose");
-            DataBase.getInstance(CameraActivity.this).add_red_scan(scan_type, scan);
 
             return null;
         }
@@ -144,8 +145,9 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            // todo  Intent openResultIntent = Intent(CameraActivity.this, f)
-            setResult(10);
+            Intent intent = new Intent(CameraActivity.this, ResultActivity.class);
+            intent.putExtra("scan", scan);
+            startActivity(intent);
             CameraActivity.this.finish();
         }
     }

@@ -1,12 +1,10 @@
 package com.example.seniordesignproject2020.core.scan_types;
 
-import android.graphics.Bitmap;
+import android.os.Parcelable;
 
 import com.example.seniordesignproject2020.core.Color;
 
-import java.util.Date;
-
-public abstract class ScanType {
+public abstract class ScanType implements Parcelable {
 
     public Color surface_color;
     public Color test_color;

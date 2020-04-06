@@ -1,6 +1,9 @@
 package com.example.seniordesignproject2020.core;
 
-public class Color {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Color implements Parcelable {
 
     public int red;
     public int green;
@@ -40,4 +43,36 @@ public class Color {
 
         return new Color(red, green, blue, alpha);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.red);
+        dest.writeInt(this.green);
+        dest.writeInt(this.blue);
+        dest.writeInt(this.alpha);
+    }
+
+    protected Color(Parcel in) {
+        this.red = in.readInt();
+        this.green = in.readInt();
+        this.blue = in.readInt();
+        this.alpha = in.readInt();
+    }
+
+    public static final Parcelable.Creator<Color> CREATOR = new Parcelable.Creator<Color>() {
+        @Override
+        public Color createFromParcel(Parcel source) {
+            return new Color(source);
+        }
+
+        @Override
+        public Color[] newArray(int size) {
+            return new Color[size];
+        }
+    };
 }

@@ -1,12 +1,13 @@
 package com.example.seniordesignproject2020.core;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
 
-import java.sql.Date;
-
-public class Scan {
+public class Scan implements Parcelable {
 
     public int id;
     public long date;
@@ -29,4 +30,37 @@ public class Scan {
         this.scan_result = scan_result;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeLong(this.date);
+        dest.writeParcelable(this.scan_type, flags);
+        dest.writeString(this.image_location);
+        dest.writeString(this.scan_result);
+    }
+
+    protected Scan(Parcel in) {
+        this.id = in.readInt();
+        this.date = in.readLong();
+        this.scan_type = in.readParcelable(ScanType.class.getClassLoader());
+        this.image_location = in.readString();
+        this.scan_result = in.readString();
+    }
+
+    public static final Parcelable.Creator<Scan> CREATOR = new Parcelable.Creator<Scan>() {
+        @Override
+        public Scan createFromParcel(Parcel source) {
+            return new Scan(source);
+        }
+
+        @Override
+        public Scan[] newArray(int size) {
+            return new Scan[size];
+        }
+    };
 }

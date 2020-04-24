@@ -31,6 +31,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import java.io.File;
@@ -102,6 +103,10 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
                 loading.setVisibility(View.VISIBLE);
                 button_scan.setVisibility(View.GONE);
                 new AsyncImageProcess().execute(mRGBAT);
+                Mat frame_ = mRGBAT;
+                Imgproc.cvtColor(frame_, frame_, Imgproc.COLOR_RGBA2RGB);
+
+                new AsyncImageProcess().execute(frame_);
                 javaCameraView.disableView();
 
             }
@@ -137,6 +142,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
             scan_type = new RedColorScan(surface_color, test_color);
             scan = new Scan(NULL, System.currentTimeMillis() / 1000, scan_type,
                     get_image(mats[0]), "0.32 Glucose");
+            DataBase.getInstance(CameraActivity.this).add_red_scan(scan_type, scan);
 
             return null;
         }
@@ -159,6 +165,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         protected Mat doInBackground(Mat... mats) {
             Mat circles = new Mat();
 
+            Imgproc.blur(mats[0], mats[0], new Size(7, 7), new Point(2, 2));
             Imgproc.HoughCircles(mats[0], circles, Imgproc.CV_HOUGH_GRADIENT, 2, 100, 100, 90, 0, 1000);
 
             // returns number of circular objects found
@@ -172,6 +179,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
             if (circles.cols() > 0) {
                 circles_ = circles;
             }
+            is_task_working = false;
 
         }
     }
@@ -195,12 +203,12 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
     public void onResume() {
         super.onResume();
         if(OpenCVLoader.initDebug()){
-            Log.d("AAAAAAAAAA","AAAAAAAAAAAAAAAAA");
+            Log.d("OpenCV-ERROR","OpenCVLoader is initialized.");
             baseLoaderCallback.onManagerConnected(BaseLoaderCallback.SUCCESS);
         }
         else
         {
-            Log.d("BBBBBBBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBBBBBB");
+            Log.d("OpenCV-ERROR","Cant initialize OpenCVLoader.");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, baseLoaderCallback);
         }
     }
@@ -210,17 +218,27 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
     }
 
+    static boolean is_task_working = false;
+
+    CameraBridgeViewBase.CvCameraViewFrame frame;
     int count = 0;
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //Imgproc.GaussianBlur(mRGBA, mRGBAT, new Size(100, 100), 1.0);
         input = inputFrame.gray();
-        //Imgproc.blur(input, input, new Size(7, 7), new Point(2, 2));
+        Imgproc.blur(input, input, new Size(7, 7), new Point(2, 2));
+        Imgproc.HoughCircles(input, input, Imgproc.CV_HOUGH_GRADIENT, 2, 100, 100, 90, 0, 1000);
 
-        //task = new HoughCircleTransformTask();
-        //task.execute(input);
-        count++;
         /**
+        if(!is_task_working)
+        {
+            task = new HoughCircleTransformTask();
+            task.execute(input);
+        }
+        **/
+
+        //count++;
+
         if (circles_.cols() > 0) {
             for (int x=0; x < Math.min(circles_.cols(), 2); x++ ) {
                 double circleVec[] = circles_.get(0, x);
@@ -249,22 +267,22 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
         //Log.i("SSSSSSSSSSSSSSSSSSSSSS", String.valueOf("size: " + circles.cols()) + ", " + String.valueOf(circles.rows()));
 
-        //Point rect_sPoint = new Point((frame_width * 3) / 8, (frame_height * 1) / 5);
-        //Point rect_ePoint = new Point((frame_width * 5) / 8, (frame_height * 4) / 5);
-        //Imgproc.rectangle(input, rect_sPoint, rect_ePoint, new Scalar(50, 205, 50), 3);
+        Point rect_sPoint = new Point((frame_width * 3) / 8, (frame_height * 1) / 5);
+        Point rect_ePoint = new Point((frame_width * 5) / 8, (frame_height * 4) / 5);
+        Imgproc.rectangle(input, rect_sPoint, rect_ePoint, new Scalar(50, 205, 50), 3);
 
 
         //Line 1
-        /**
+
         Point line_sPoint = new Point((frame_width * 3) / 8, (frame_height * 2) / 5);
         Point line_ePoint = new Point((frame_width * 5) / 8, (frame_height * 2) / 5);
         Imgproc.line(input, line_sPoint, line_ePoint, new Scalar(50, 205, 50), 3);
         //Line 2
-        /**
+
          line_sPoint = new Point((frame_width * 3) / 8, (frame_height * 3) / 5);
          line_ePoint = new Point((frame_width * 5) / 8, (frame_height * 3) / 5);
          Imgproc.line(input, line_sPoint, line_ePoint, new Scalar(50, 205, 50), 3);
-         **/
+
 
         /*
         if (circles.cols() > 0) {

@@ -17,8 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.seniordesignproject2020.R;
+import com.example.seniordesignproject2020.core.Scan;
 import com.example.seniordesignproject2020.core.database.DataBase;
 import com.example.seniordesignproject2020.util.ShareUtil;
+
+import java.io.File;
 
 public class GalleryFragment extends Fragment {
 
@@ -30,8 +33,12 @@ public class GalleryFragment extends Fragment {
         if(itemsAdapter == null) {
             itemsAdapter = new GalleryAdapter(inflater.getContext(), DataBase.getInstance(getContext()).get_scans(), new GalleryAdapter.OnItemInteraction() {
                 @Override
-                public void onDelete(int id) {
+                public void onDelete(int id, String imgUri) {
                     DataBase.getInstance(getContext()).remove_scan(id);
+
+                    File file = new File(Uri.parse(imgUri).getPath());
+                    if(file.exists())
+                        file.delete();
                 }
 
                 @Override

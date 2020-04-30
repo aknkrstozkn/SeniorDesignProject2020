@@ -18,16 +18,20 @@ import com.example.seniordesignproject2020.core.scan_types.ScanType;
 import com.example.seniordesignproject2020.util.ShareUtil;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
 import java.util.Date;
 
 public class ResultActivity extends AppCompatActivity {
+
+    Scan scan;
+    boolean is_saved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-
-        final Scan scan = getIntent().getParcelableExtra("scan");
+        is_saved = false;
+        scan = getIntent().getParcelableExtra("scan");
         if(scan == null) {
             finish();
             return;
@@ -50,6 +54,7 @@ public class ResultActivity extends AppCompatActivity {
                 Snackbar.make(view, "Saved to the database", Snackbar.LENGTH_LONG).show();
                 save.setOnClickListener(null);
                 save.setImageAlpha(128);
+                is_saved = true;
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -59,5 +64,18 @@ public class ResultActivity extends AppCompatActivity {
                         scan.image_location, scan.scan_result);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(!is_saved)
+        {
+            File file = new File(Uri.parse(scan.image_location).getPath());
+            if(file.exists())
+                file.delete();
+        }
+
     }
 }

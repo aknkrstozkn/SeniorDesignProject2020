@@ -38,7 +38,7 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     }
 
     interface OnItemInteraction {
-        void onDelete(int id);
+        void onDelete(int id, String imgUri);
         void onShare(String imgUri, String result);
     }
 
@@ -67,7 +67,7 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemInteraction.onDelete(item.id);
+                onItemInteraction.onDelete(item.id, item.image_location);
                 items.remove(position);
                 notifyDataSetChanged();
             }

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import com.example.seniordesignproject2020.core.Color;
 import com.example.seniordesignproject2020.core.Scan;
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
+import com.example.seniordesignproject2020.core.scan_types.Train;
 
 public class ModelConverter {
 
@@ -21,6 +22,29 @@ public class ModelConverter {
             throw e;
         }
 
+        return values;
+    }
+
+    protected ContentValues train(Train train)
+    {
+        ContentValues values = new ContentValues();
+        try
+        {
+            Color base_color = train.base_color;
+            Color test_color = train.test_color;
+            double label = train.label;
+
+            values.put(DataBase.BASE_RED, base_color.red);
+            values.put(DataBase.BASE_GREEN, base_color.green);
+            values.put(DataBase.BASE_BLUE, base_color.blue);
+            values.put(DataBase.TEST_RED, test_color.red);
+            values.put(DataBase.TEST_GREEN, test_color.green);
+            values.put(DataBase.TEST_BLUE, test_color.blue);
+            values.put(DataBase.LABEL, label);
+        } catch (Exception e)
+        {
+            throw e;
+        }
         return values;
     }
 

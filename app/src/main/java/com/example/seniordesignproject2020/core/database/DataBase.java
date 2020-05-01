@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi;
 
 import com.example.seniordesignproject2020.core.Scan;
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
+import com.example.seniordesignproject2020.core.scan_types.Train;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,17 @@ public class DataBase extends SQLiteOpenHelper {
     public final static String DATE = "DATE";
     public final static String IMAGE_LOCATION = "IMAGE_LOCATION";
     public final static String RESULT = "RESULT";
+
+    //TABLE NAME =  TRAIN_TABLE
+    public final static String TRAIN_TABLE = "TRAIN_TABLE";
+    //TABLE TRAIN_TABLE COLUMN'S NAMES
+    public final static String BASE_RED = "BASE_RED";
+    public final static String BASE_GREEN = "BASE_GREEN";
+    public final static String BASE_BLUE = "BASE_BLUE";
+    public final static String TEST_RED = "TEST_RED";
+    public final static String TEST_GREEN = "TEST_GREEN";
+    public final static String TEST_BLUE = "TEST_BLUE";
+    public final static String LABEL = "LABEL";
 
     private static ModelConverter model_converter;
     private static DataConverter data_converter;
@@ -81,11 +93,31 @@ public class DataBase extends SQLiteOpenHelper {
                 + TEST_COLOR + " INTEGER,"
                 + "PRIMARY KEY(" + SCAN_ID + "))";
         db.execSQL(create_red_scan_table);
+
+        String create_train_table = "CREATE TABLE " + TRAIN_TABLE + "("
+                + BASE_RED + " INTEGER,"
+                + BASE_GREEN + " INTEGER,"
+                + BASE_BLUE + " INTEGER,"
+                + TEST_RED + " INTEGER,"
+                + TEST_GREEN + " INTEGER,"
+                + TEST_BLUE + " INTEGER,"
+                + LABEL + " REAL)";
+        db.execSQL(create_train_table);
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public void add_train_table(Train train)
+    {
+        try (SQLiteDatabase db = this.getWritableDatabase())
+        {
+            ContentValues values = model_converter.train(train);
+            db.insert(TRAIN_TABLE, null, values);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

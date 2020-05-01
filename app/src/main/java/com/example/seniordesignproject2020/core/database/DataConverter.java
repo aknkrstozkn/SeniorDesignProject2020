@@ -6,6 +6,7 @@ import com.example.seniordesignproject2020.core.Color;
 import com.example.seniordesignproject2020.core.Scan;
 import com.example.seniordesignproject2020.core.scan_types.RedColorScan;
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
+import com.example.seniordesignproject2020.core.scan_types.Train;
 
 public class DataConverter {
 
@@ -24,6 +25,26 @@ public class DataConverter {
             throw e;
         }
         return scan_type;
+    }
+
+    protected Train train(Cursor cursor)
+    {
+        Train train;
+        try {
+            Color base_color = new Color(cursor.getInt(cursor.getColumnIndex(DataBase.BASE_RED))
+                                , cursor.getInt(cursor.getColumnIndex(DataBase.BASE_GREEN))
+                                , cursor.getInt(cursor.getColumnIndex(DataBase.BASE_BLUE)));
+            Color test_color = new Color(cursor.getInt(cursor.getColumnIndex(DataBase.TEST_RED))
+                                , cursor.getInt(cursor.getColumnIndex(DataBase.TEST_GREEN))
+                                , cursor.getInt(cursor.getColumnIndex(DataBase.TEST_BLUE)));
+            double label = cursor.getDouble(cursor.getColumnIndex(DataBase.LABEL));
+            train = new Train(base_color, test_color, label);
+
+        } catch (Exception e)
+        {
+            throw e;
+        }
+        return train;
     }
 
     protected Scan scan(Cursor cursor, ScanType scan_type)

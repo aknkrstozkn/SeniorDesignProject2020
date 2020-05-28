@@ -3,17 +3,26 @@ package com.example.seniordesignproject2020.ui.home;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.CoreComponentFactory;
+import org.tensorflow.lite.*;
 
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.seniordesignproject2020.R;
 import com.example.seniordesignproject2020.core.Circle;
@@ -24,6 +33,7 @@ import com.example.seniordesignproject2020.core.scan_types.RedColorScan;
 import com.example.seniordesignproject2020.core.scan_types.ScanType;
 import com.example.seniordesignproject2020.ui.gallery.GalleryFragment;
 import com.example.seniordesignproject2020.ui.result.ResultActivity;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -37,7 +47,22 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.QRCodeDetector;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -50,6 +75,7 @@ import static java.sql.Types.NULL;
 public class CameraActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     public File FILE_PATH;
+    public File MODEL_PATH;
 
     private Scan scan;
     private ScanType scan_type;
@@ -57,13 +83,14 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
     private Calendar caledar;
 
     JavaCameraView javaCameraView;
+    TextView text_view_control_message;
+    ImageView image_view_control;
     View loading;
     Mat mRGBA, mRGBAT;
     public static Mat circles_;
     public static Mat input;
-    HoughCircleTransformTask task;
-
     Button button_scan;
+    Button button_train;
 
     float frame_width, frame_height;
 
@@ -107,6 +134,9 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         javaCameraView.setVisibility(SurfaceView.VISIBLE);
         javaCameraView.setCvCameraViewListener(this);
 
+        text_view_control_message = findViewById(R.id.text_view_control_message);
+        image_view_control = findViewById(R.id.image_view_control);
+
         loading = findViewById(R.id.loading);
         loading.setVisibility(View.GONE);
         FILE_PATH = new File(this.getFilesDir(), "Scans");
@@ -124,8 +154,6 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         });
 
         circles_ = new Mat();
-
-
 
         javaCameraView.disableView();
         javaCameraView.enableView();
@@ -234,17 +262,91 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
             Imgproc.cvtColor(mats[0], mats[0], Imgproc.COLOR_BGRA2RGB, 4);
 
-            Color surface_color = colors[0];
+            Color base_color = colors[0];
             Color test_color = colors[1];
 
-            String result_1 = surface_color.red + "," + surface_color.green + "," + surface_color.blue;
-            String result_2 = test_color.red + "," + test_color.green + "," + test_color.blue;
+            float[][] new_input = {{(float)base_color.red, (float)base_color.green, (float)base_color.blue
+                , (float)test_color.red, (float)test_color.green, (float)test_color.blue}};
 
-            scan_type = new RedColorScan(surface_color, test_color);
+//            float[][] new_input = {{243, 244, 237, 215, 167, 96}};
+
+            float[][] new_output = new float[1][5];
+
+//            File tensorflow_lite_model_file = new File("android.resource://"
+//                    + getPackageName()
+//                    + "/"
+//                    + R.raw.converted_model);
+
+//            AssetFileDescriptor assetFileDescriptor = null;
+//            try {
+//                assetFileDescriptor = getAssets().openFd("converted_model.tflite");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            //Log.d("Tensorflow", tensorflow_lite_model_file.getAbsolutePath());
+//
+//            MappedByteBuffer tflite_model = null;
+//            FileInputStream f_input_stream = null;
+//            FileChannel f_channel = null;
+//            try {
+//                f_input_stream = assetFileDescriptor.createInputStream();
+//
+//                f_channel = f_input_stream.getChannel();
+//                tflite_model = f_channel.map(FileChannel.MapMode.READ_ONLY, 0, f_channel.size());
+//
+//            } catch (FileNotFoundException e) {
+//                Log.d("Tensorflow", "converted model not found");
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            if(tflite_model == null)
+//            {
+//                Log.d("Tensorflow", "tflite_model is null");
+//            }
+//            if(f_channel == null)
+//            {
+//                Log.d("Tensorflow", "f_channel is null");
+//            }
+//            if(f_input_stream == null)
+//            {
+//                Log.d("Tensorflow", "f_input_stream is null");
+//            }
+
+            MappedByteBuffer tflite_model = null;
+            try {
+                tflite_model = loadModelFile(getAssets(), "converted_model.tflite");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try (Interpreter interpreter = new Interpreter(tflite_model)) {
+                interpreter.run(new_input, new_output);
+            }
+
+            float prediction = 0;
+            for(int i = 0; i < 5; ++i)
+            {
+                prediction = ((new_output[0][i] * 1000000) > prediction) ? (i + 1) : prediction;
+            }
+
+            scan_type = new RedColorScan(base_color, test_color);
             scan = new Scan(NULL, System.currentTimeMillis() / 1000, scan_type,
-                    get_image(mats[0]), result_1 + "--" + result_2);
+                    get_image(mats[0]), String.valueOf(prediction));
 
             return null;
+        }
+
+        private MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
+                throws IOException {
+            AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
+            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = inputStream.getChannel();
+            long startOffset = fileDescriptor.getStartOffset();
+            long declaredLength = fileDescriptor.getDeclaredLength();
+            return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
         }
 
         @Override
@@ -258,31 +360,6 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
         }
     }
 
-    static private class HoughCircleTransformTask
-            extends AsyncTask<Mat, Void, Mat> {
-
-        @Override
-        protected Mat doInBackground(Mat... mats) {
-            Mat circles = new Mat();
-
-            Imgproc.blur(mats[0], mats[0], new Size(7, 7), new Point(2, 2));
-            Imgproc.HoughCircles(mats[0], circles, Imgproc.CV_HOUGH_GRADIENT, 2, 100, 100, 90, 0, 1000);
-
-            // returns number of circular objects found
-            // then display it from onPostExecute()
-            return circles;
-        }
-
-        @Override
-        protected void onPostExecute(Mat circles) {
-
-            if (circles.cols() > 0) {
-                circles_ = circles;
-            }
-            is_task_working = false;
-
-        }
-    }
 
     @Override
     public void onCameraViewStopped() {
@@ -331,11 +408,48 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
     CameraBridgeViewBase.CvCameraViewFrame frame;
     int count = 0;
+    boolean is_qr_code_detected = false;
+    String qr_code_value;
+    boolean detect_qr_code(Mat frame)
+    {
+        if(!is_qr_code_detected)
+        {
+            QRCodeDetector qr_code_detector = new QRCodeDetector();
+            qr_code_value = qr_code_detector.detectAndDecode(frame);
+            if(!qr_code_value.isEmpty())
+            {
+                is_qr_code_detected = true;
+                Snackbar.make(javaCameraView, qr_code_value, Snackbar.LENGTH_LONG).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        text_view_control_message.setText("Test yüzeylerinin tespiti ile taramayı gerçekleştirin");
+                        image_view_control.setBackgroundResource(R.mipmap.ic_check);
+                    }
+                });
+
+                return true;
+            }
+            return false;
+        }else
+            {
+                return true;
+            }
+    }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //Imgproc.GaussianBlur(mRGBA, mRGBAT, new Size(100, 100), 1.0);
-        if (!is_task_working) {
+        if(!detect_qr_code(inputFrame.rgba()))
+        {
+            mRGBA = inputFrame.rgba();
+            mRGBAT = mRGBA.t();
+            Core.flip(mRGBA.t(), mRGBAT, 1);
+            Imgproc.resize(mRGBAT, mRGBAT, mRGBA.size());
+
+        }else if (!is_task_working ) {
+
+
             Mat gray_frame = inputFrame.gray();
 
             Mat circles = new Mat();
@@ -370,6 +484,7 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
                 Core.flip(mRGBA.t(), mRGBAT, 1);
                 Imgproc.resize(mRGBAT, mRGBAT, mRGBA.size());
             }
+
 
             circles.release();
             gray_frame.release();

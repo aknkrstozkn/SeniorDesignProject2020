@@ -28,6 +28,14 @@ public class Color implements Parcelable {
         this.alpha = 255;
     }
 
+    @Override
+    public String toString()
+    {
+        return String.valueOf(red) + ", "
+                + String.valueOf(green) + ", "
+                + String.valueOf(blue);
+    }
+
     public static int color_to_int(Color color)
     {
         return (color.red << 24 | color.green << 16

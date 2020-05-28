@@ -20,6 +20,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@android:drawable/ic_menu_camera" />
 
+    <ImageView
+        android:id="@+id/image_view_control"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@mipmap/ic_warning"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="96dp"/>
+
+    <TextView
+        android:id="@+id/text_view_control_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="İlk önce lütfen QR Kodu tarayın."
+        android:textColor="#ffffff"
+        app:layout_constraintStart_toEndOf="@id/image_view_control"
+        app:layout_constraintBottom_toBottomOf="@id/image_view_control"
+        app:layout_constraintTop_toTopOf="@id/image_view_control"/>
     <include layout="@layout/fragment_loading" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -120,6 +120,40 @@ public class DataBase extends SQLiteOpenHelper {
         }
     }
 
+    public Train[] get_train_table()
+    {
+        Train[] trains;
+        try (SQLiteDatabase db = this.getReadableDatabase())
+        {
+            String scan_query = "SELECT * FROM " + TRAIN_TABLE;
+            try (Cursor cursor = db.rawQuery(scan_query, null)) {
+                if (cursor.getCount() != 0) {
+                    trains = new Train[cursor.getCount()];
+
+                    for(int i = 0; i < cursor.getCount(); ++i)
+                    {
+                        cursor.moveToNext();
+                        trains[i] = data_converter.train(cursor);
+                    }
+                } else
+                    return null;
+            }
+        }
+
+        return trains;
+    }
+
+    public String[] get_train_table_column_names()
+    {
+        try (SQLiteDatabase db = this.getReadableDatabase())
+        {
+            String scan_query = "SELECT * FROM " + TRAIN_TABLE;
+            try (Cursor cursor = db.rawQuery(scan_query, null)) {
+                return cursor.getColumnNames();
+            }
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public int add_scans_table(Scan scan)
     {

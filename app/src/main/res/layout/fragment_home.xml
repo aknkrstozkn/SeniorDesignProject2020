@@ -31,4 +31,53 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/open_camera" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/train_layout"
+        android:layout_width="212dp"
+        android:layout_height="240dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/open_camera">
+
+    <EditText
+        android:id="@+id/edit_text_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Label Code"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+        <ImageButton
+            android:id="@+id/open_train_camera"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:contentDescription="@string/open_camera"
+            android:fadeScrollbars="false"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_camera"
+            android:tint="#673AB7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_label"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <Button
+            android:id="@+id/button_create_csv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/open_train_camera"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="CSV"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
